@@ -63,6 +63,30 @@ Additionally, the feature importance was also observed by setting model explaina
 
 ![](screenshots/explain.png)
 
+Properties of the best model -
+
+DataTransformer(enable_dnn=None, enable_feature_sweeping=None,
+                                 feature_sweeping_config=None,
+                                 feature_sweeping_timeout=None,
+                                 featurization_config=None, force_text_dnn=None,
+                                 is_cross_validation=None,
+                                 is_onnx_compatible=None, logger=None,
+                                 observer=None, task=None, working_dir=None)),
+                ('MaxAbsScaler', MaxAbsScaler(copy...
+                 ExtraTreesClassifier(bootstrap=True, ccp_alpha=0.0,
+                                      class_weight='balanced', criterion='gini',
+                                      max_depth=None, max_features='log2',
+                                      max_leaf_nodes=None, max_samples=None,
+                                      min_impurity_decrease=0.0,
+                                      min_impurity_split=None,
+                                      min_samples_leaf=0.01,
+                                      min_samples_split=0.01,
+                                      min_weight_fraction_leaf=0.0,
+                                      n_estimators=50, n_jobs=-1,
+                                      oob_score=True, random_state=None,
+                                      verbose=0, warm_start=False))],
+         verbose=False)
+
 ### Future Improvements
 * Utilization of deep learning algorithms to achieve better performance
 * Increasing experiment timeout
@@ -80,7 +104,7 @@ The Hyperdrive run also involves other configuration settings like an early term
 
 
 ### Results
-The best model during the HyperDrive Run was a Logistic regression model with C = 100 and max_iter = 100. The accuracy of this model is 0.1.
+The best model during the HyperDrive Run was a Logistic regression model with C = 0.1 and max_iter = 50. The accuracy of this model is 1.
 
 Below is a screenshot of the run details widget -
 
@@ -109,15 +133,14 @@ The best HyperDrive model -
 
 
 ## Model Deployment
-AutoMl run produces a best model with an accuracy of 0.78, which is lower than the accuracy of the best model as produced by the HyperDrive run, which is 0.82.
+AutoMl run produces a best model with an accuracy of 0.983, which is lower than the accuracy of the best model as produced by the HyperDrive run, which is 1.
 
-Hence, the best model from the HyperDrive run is registered in the workspace.
-
+Hence, the best model from the HyperDrive run with regards to accuracy metric, is registered in the workspace. But on the other metric such as AUC_weighted the accuracy was 1 for AutoML.
 ![](screenshots/registered-model.png)
 
 The registered model is then deployed in an endpoint that can be accessed using the a REST API that looks something like this:
 
- http://XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX.southcentralus.azurecontainer.io/score
+ http://8f54af79-a4a5-425c-b1d5-3c56cb1f2fca.southcentralus.azurecontainer.io/score
 
 The deployed service can be now observed in the workspace under endpoints, with a 'Healthy' status - 
 
@@ -126,53 +149,92 @@ The deployed service can be now observed in the workspace under endpoints, with 
 
 The input to be provided to the above endpoint should be in the JSON format. For Eg. - 
 ```
-"data":
+data = {"data":
         [
             {
-                "Pregnancies": 6,
-                "Glucose": 148,
-                "BloodPressure": 72,
-                "SkinThickness": 35,
-                "Insulin": 0,
-                "BMI": 33.6,
-                "DiabetesPedigreeFunction": 0.627,
-                "Age": 50
+               
+                "alcohol": 14.23,
+                "malicAcid": 1.71,
+                "ash":2.43,
+                "ashalcalinity": 15.6,
+                "magnesium": 127,
+                "totalPhenols": 2.80,
+                "flavanoids": 3.06,
+                "nonFlavanoidPhenols": 0.28,
+                "proanthocyanins": 2.29,
+                "colorIntensity":5.64,
+                "hue":1.04,
+                "od280_od315":3.92,
+                "proline":1065
+
+
+            },
+            {
+               
+                "alcohol": 13.16,
+                "malicAcid": 2.36,
+                "ash":2.67,
+                "ashalcalinity": 18.6,
+                "magnesium": 101,
+                "totalPhenols": 2.80,
+                "flavanoids": 3.24,
+                "nonFlavanoidPhenols": 0.30,
+                "proanthocyanins": 2.81,
+                "colorIntensity":5.68,
+                "hue":1.03,
+                "od280_od315":3.17,
+                "proline":1185
             }
         ]
+    }
 ```
 
 To query the endpoint using above data - 
 ```python
-import requests
 import json
-
-scoring_uri = 'http://01b44a8b-d762-47c0-af37-16bc6cdf52aa.southcentralus.azurecontainer.io/score'
-
-data = { "data":
+data = {"data":
         [
             {
-                "Pregnancies": 6,
-                "Glucose": 148,
-                "BloodPressure": 72,
-                "SkinThickness": 35,
-                "Insulin": 0,
-                "BMI": 33.6,
-                "DiabetesPedigreeFunction": 0.627,
-                "Age": 50
+                "alcohol": 14.23,
+                "malicAcid": 1.71,
+                "ashalcalinity": 15.6,
+                "magnesium": 127,
+                "totalPhenols": 2.80,
+                "flavanoids": 3.06,
+                "nonFlavanoidPhenols": 0.28,
+                "proanthocyanins": 2.29,
+                "colorIntensity":5.64,
+                "hue":1.04,
+                "od280_od315":3.92,
+                "proline":1065
+
+
+            },
+            {
+                "alcohol": 13.16,
+                "malicAcid": 2.36,
+                "ashalcalinity": 18.6,
+                "magnesium": 101,
+                "totalPhenols": 2.80,
+                "flavanoids": 3.24,
+                "nonFlavanoidPhenols": 0.30,
+                "proanthocyanins": 2.81,
+                "colorIntensity":5.68,
+                "hue":1.03,
+                "od280_od315":3.17,
+                "proline":1185
             }
         ]
-       }
-
+    }
 input_payload = json.dumps(data)
-headers = {'Content-Type': 'application/json'}
-response = requests.post(scoring_uri, input_payload, headers=headers)
-print(response.json())
+output = service.run(input_payload)
+print(output)
 ```
 
-As a response, we receive either a 1 , 2, or 3, representing the predictions that the based on the inpute features which wine category should be classified.
+As a response, we receive either a 1 , 2, or 3, representing the predictions that the based on the inpute features which wine category should be classified. Note,that I have ommited the Ash feature as it was least relevant to the predictions.
 
 ## Screen Recording
-https://youtu.be/BlVoA5Lf6HM
+https://youtu.be/61bJcqHC1B0
 
 ## Standout Suggestions
 In addition to the project requirements, some additional features from standout suggestions were also implemented.
