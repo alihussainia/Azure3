@@ -32,7 +32,7 @@ The registered dataset in Azure ML Studio -
 The settings for the AutoML run are as follows - 
 * Experiment Timeout - This is set to a period of 60 minutes, which is sufficient time to get a model with satisfactory accuracy.
 * Maximum Concurrent Iterations - The number of runs that can be processed concurrently. This value cannot be greater than the maximum number of nodes in the compute cluster to be utilized.
-* Primary Metric - This is set as accuracy.
+* Primary Metric - This is set as AUC_weighted.
 * A Computer target is also specified for running the experiment
 * Task - This is set as Classification, since we wish to predict the class of wine based on certain winery features.
 * Training Data - Chosen as the Wine dataset from UCI Website.
