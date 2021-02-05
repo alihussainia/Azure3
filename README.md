@@ -9,6 +9,8 @@ The dataset chosen for this project can be found at https://archive.ics.uci.edu/
 
 These data are the results of a chemical analysis of wines grown in the same region in Italy but derived from three different cultivars. The analysis determined the quantities of 13 constituents found in each of the three types of wines. The output will be either 1, 2, or 3 representing the corresponding type of wilne.
 
+![](screenshots/wine_stats.png)
+
 ### Task
 The purpose of this project will be to work on an external dataset of choice, in this case, the Wine dataset. Using Azure ML SDK, the data will be used to train different HyperDrive and AutoML models. The job is a classification type task, and the model that performs the best in terms of accuracy will be deployed as a web service on Azure. The resulting endpoint will be then be consumed.
 
